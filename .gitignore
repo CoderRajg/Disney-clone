@@ -24,4 +24,4 @@ yarn-error.log*
 
 
 
-\src\Firebase.js
+/src/Firebase.js
