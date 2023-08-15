@@ -1,16 +1,14 @@
 import React from "react";
 import styled from "styled-components";
-// import { auth , provider } from "../Firebase";
-import db, { auth, provider } from "../Firebase";
+import  { auth, provider } from "../Firebase";
 import { signInWithPopup } from "firebase/auth";
-// import { useNavigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import {
   selectUserName,
-  selectUserEmail,
   selectUserPhoto,
   setUserLoginDetails,
   setSignOutState
@@ -20,7 +18,6 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userName = useSelector(selectUserName);
-  const userEmail = useSelector(selectUserEmail);
   const userPhoto = useSelector(selectUserPhoto);
 
   useEffect(() => {
@@ -30,14 +27,13 @@ const Header = () => {
         navigate("/home");
       }
     });
-  }, [userName]);
+  },[userName]);
 
   const handleAuth = () => {
     if(!userName){
     signInWithPopup(auth, provider)
       .then((result) => {
         setUser(result.user);
-        // console.log(result);
       })
       .catch((error) => {
         alert(error.message);
@@ -74,20 +70,23 @@ const Header = () => {
       ) : (
         <>
           <NavMenu>
-            <a href="/">
+            <Link to="/home">
+            <a>
               <img src="/image/home-icon.svg" alt="HOME" />
               <span>HOME</span>
             </a>
+            </Link>
+            
             <a>
-              <img src="/image/search-icon.svg" alt="HOME" />
+              <img src="/image/search-icon.svg" alt="SEARCH" />
               <span>SEARCH</span>
             </a>
             <a>
-              <img src="/image/watchlist-icon.svg" alt="HOME" />
+              <img src="/image/watchlist-icon.svg" alt="WATCHLIST" />
               <span>WATCHLIST</span>
             </a>
             <a>
-              <img src="/image/home-icon.svg" alt="HOME" />
+              <img src="/image/home-icon.svg" alt="ORIGINALS" />
               <span>ORIGINALS</span>
             </a>
             <a>
@@ -95,7 +94,7 @@ const Header = () => {
               <span>MOVIES</span>
             </a>
             <a>
-              <img src="/image/series-icon.svg" alt="HOME" />
+              <img src="/image/series-icon.svg" alt="SERIES" />
               <span>SERIES</span>
             </a>
           </NavMenu>

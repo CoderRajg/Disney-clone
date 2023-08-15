@@ -1,64 +1,69 @@
 import styled from "styled-components";
-import React from "react";
+import React, { useEffect } from "react";
 import ImageSlider from "./ImageSlider";
 import Viewers from "./Viewers";
 import Recommends from "./Recommends";
 import NewDisney from "./NewDisney";
 import Originals from "./Originals";
 import Trending from "./Trending";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import db from "../Firebase";
-import { selectUserName } from "../features/user/userSlice";
+import {
+  selectUserEmail,
+} from "../features/user/userSlice";
 import { setMovies } from "../features/movies/movieSlice";
 import { collection, getDocs } from "firebase/firestore";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const userName = useSelector(selectUserName);
-  let recommends = [];
-  let originals = [];
-  let newDisneys = [];
-  let trendings = [];
-  const fetchMovies = async () => {
-    const querySnapshot = await getDocs(collection(db, "movies"));
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      // console.log(doc.id, " => ", doc.data());
-      // console.log(doc.data().recommend);
-      // if (doc.data().type === "recommend") {
-      //   console.log(doc);
-      // }
-      switch (doc.data().type) {
-        case "recommend":
-          recommends = [...recommends, { id: doc.id, ...doc.data() }];
-          break;
-
-        case "new":
-          newDisneys = [...newDisneys, { id: doc.id, ...doc.data() }];
-          break;
-
-        case "original":
-          originals = [...originals, { id: doc.id, ...doc.data() }];
-          break;
-
-        case "trending":
-          trendings = [...trendings, { id: doc.id, ...doc.data() }];
-          break;
-      }
-    })
-    dispatch(
-      setMovies({
-        recommend: recommends,
-        original: originals,
-        newDisney: newDisneys,
-        trending: trendings,
-      })
-    );
-  };
+  const userEmail = useSelector(selectUserEmail);
+  
   useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "movies"));
+        let recommends = [];
+        let originals = [];
+        let newDisneys = [];
+        let trendings = [];
+
+        querySnapshot.forEach((doc) => {
+          switch (doc.data().type) {
+            case "recommend":
+              recommends.push({ id: doc.id, ...doc.data() });
+              break;
+
+            case "new":
+              newDisneys.push({ id: doc.id, ...doc.data() });
+              break;
+
+            case "original":
+              originals.push({ id: doc.id, ...doc.data() });
+              break;
+
+            case "trending":
+              trendings.push({ id: doc.id, ...doc.data() });
+              break;
+            default :
+              break;
+          }
+        });
+
+        dispatch(
+          setMovies({
+            recommend: recommends,
+            original: originals,
+            newDisney: newDisneys,
+            trending: trendings,
+          })
+        );
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    };
+
     fetchMovies();
-  }, [userName]);
+  }, [dispatch, userEmail]);
 
   return (
     <Container>
@@ -91,3 +96,5 @@ const Container = styled.main`
 `;
 
 export default Home;
+
+
